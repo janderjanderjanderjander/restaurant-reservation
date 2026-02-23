@@ -4,8 +4,18 @@ package com.example.restaurant.service;
 
 import com.example.restaurant.model.Table;
 import org.springframework.stereotype.Service;
+import com.example.restaurant.model.Booking;
 
 import java.util.List;
+import java.time.Duration;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
 
 @Service
 public class FloorPlanService {
@@ -23,6 +33,10 @@ public class FloorPlanService {
         return tables;
     }
 
+
+    public List<Booking> getBookingsFor(LocalDate date) {
+        return generateBookingsFor(date);
+    }
     //Generates 18 random bookings for entered date. Removes overlapping bookings, so bookins could be <18. 
     private List<Booking> generateBookingsFor(LocalDate date) {
         long seed = date.toEpochDay(); //random seed for each day
@@ -64,10 +78,10 @@ public class FloorPlanService {
             result.add(candidate);
             //add to mapping
             bookingsByTable
-                .computeIfAbsent(tableid, k -> new ArrayList<>())
+                .computeIfAbsent(tableId, k -> new ArrayList<>())
                 .add(candidate);
         }
-    return result;
+        return result;
     }
 
     //Helper function to detect overlaps
@@ -83,5 +97,6 @@ public class FloorPlanService {
                              LocalDateTime bStart, LocalDateTime bEnd) {
         return aStart.isBefore(bEnd) && bStart.isBefore(aEnd);
     }
+
     //TODO - Method to return occupied tables
 }
