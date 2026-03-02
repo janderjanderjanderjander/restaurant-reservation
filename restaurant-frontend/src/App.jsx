@@ -14,6 +14,7 @@ const [tables, setTables] = useState([]);
 const [hoveredTableId, setHoveredTableId] = useState(null);
 const [selectedTableId, setSelectedTableId] = useState(null);
 const [bookings, setBookings] = useState([]);
+const [suggestedTableId, setSuggestedTableId] = useState(null);
 
 //run once, fetch my tables
   useEffect(() => {
@@ -33,6 +34,7 @@ const [bookings, setBookings] = useState([]);
     .then(setBookings)
     .catch(console.error)
   }, [selectedDate]);
+
 
 //helper function to see availability
   const isItBooked = (selectedISO, startISO, endISO) => {
@@ -60,7 +62,7 @@ const [bookings, setBookings] = useState([]);
     return map
   }, [tables, bookings, selectedDateTimeISO]);
 
-  const filteredTables = useMemo(() => {
+const filteredTables = useMemo(() => {
     return tables.filter((t) => {
       if (t.seats < partySize) return false;
       const status = tableStatus[t.id] ?? "available";
@@ -69,7 +71,23 @@ const [bookings, setBookings] = useState([]);
     });
   }, [tables, partySize, showAvailableOnly, tableStatus]);
 
-  const selectedTable = useMemo(() => {
+const availableTables = useMemo(() => {
+  return filteredTables.filter(
+    (t) => tableStatus[t.id] === "available"
+  );
+}, [filteredTables, tableStatus]);
+
+//Select suggested table for highlight
+useEffect(() => {
+  if (availableTables.length === 0) {
+    setSuggestedTableId(null); 
+    return;
+  }
+
+  setSuggestedTableId(availableTables[0].id);
+}, [availableTables]);
+
+const selectedTable = useMemo(() => {
     return tables.find((t) => t.id === selectedTableId) ?? null;
   }, [tables, selectedTableId]);
 
@@ -80,8 +98,6 @@ const [bookings, setBookings] = useState([]);
       .filter((b) => b.tableId === selectedTableId)
       .sort((a, b) => new Date(a.start) - new Date(b.start));
   }, [bookings, selectedTableId]);
-
-  
 
   const isTableVisible = (table) => filteredTables.some((t) => t.id === table.id);
 
@@ -101,18 +117,100 @@ const [bookings, setBookings] = useState([]);
     <div
       style={{
         display: "grid",
-        gridTemplateColumns: "3fr 1fr",
+        gridTemplateColumns: "5fr 1fr",
         height: "100vh",
       }}
     >
       {/* FLOOR PLAN */}
       <div style={{ borderRight: "1px solid #ccc" }}>
-        <svg width="100%" height="100%">
+        <svg width="100%" height="100%" viewBox="0 0 800 600" preserveAspectRatio="xMidYMid meet">
+          <line
+            x1="0"
+            y1="225"
+            x2="475"
+            y2="225"
+            stroke="#999"
+            strokeWidth="2"
+            strokeDasharray="6 4"
+          />
+          <line
+            x1="475"
+            y1="225"
+            x2="475"
+            y2="0"
+            stroke="#999"
+            strokeWidth="2"
+            strokeDasharray="6 4"
+          />
+          <line
+            x1="475"
+            y1="225"
+            x2="475"
+            y2="450"
+            stroke="#999"
+            strokeWidth="2"
+            strokeDasharray="6 4"
+          />          
+          <line
+            x1="0"
+            y1="450"
+            x2="600"
+            y2="450"
+            stroke="#999"
+            strokeWidth="2"
+            strokeDasharray="6 4"
+          />      
+          <line
+            x1="600"
+            y1="450"
+            x2="600"
+            y2="0"
+            stroke="#999"
+            strokeWidth="2"
+            strokeDasharray="6 4"
+          />
+          <text
+            x="10"
+            y="50"
+            fontSize="40"
+            fill="#fff"
+          >
+            Floor Plan
+          </text>
+
+          <text
+            x="10"
+            y="200" //225
+            fontSize="24" 
+            fill="#fff"
+          >
+            Main hall
+          </text>
+
+          <text
+            x="10"
+            y="425" //450
+            fontSize="24"
+            fill="#fff"
+          >
+            Terrace
+          </text>
+
+          <text
+            x="490"
+            y="425" //450
+            fontSize="24"
+            fill="#fff"
+          >
+            VIP table
+          </text>
+
           {tables.map((table) => {
             const visible = isTableVisible(table);
             const isHovered = hoveredTableId === table.id;
             const isSelected = selectedTableId === table.id;
-
+            const isSuggested = table.id === suggestedTableId;
+            
             const fill = isHovered
               ? hoverFillFor(table, visible)
               : baseFillFor(table, visible);
@@ -127,8 +225,16 @@ const [bookings, setBookings] = useState([]);
                 rx="8"
                 ry="8"
                 fill={fill}
-                stroke={isSelected ? "#1f6feb" : "black"}
-                strokeWidth={isSelected ? 4 : 1}
+                stroke={
+                  isSelected
+                    ? "#1f6feb"
+                    : isSuggested
+                    ? "#ffff00"
+                    : "#000000"
+                  }
+                    strokeWidth={
+                    isSuggested || isSelected ? 2 : 1
+                  }
                 style={{
                   cursor: visible ? "pointer" : "not-allowed",
                   transition: "fill 120ms ease, stroke-width 120ms ease",
@@ -170,25 +276,18 @@ const [bookings, setBookings] = useState([]);
           </div>
 
           <div>
-            <label>Party Size: {partySize}</label>
-            <input
-              type="range"
-              min="1"
-              max="8"
+            <label htmlFor="partySize">Party Size:</label>
+            <select
+              id="partySize"
               value={partySize}
               onChange={(e) => setPartySize(Number(e.target.value))}
-            />
-          </div>
-
-          <div style={{ marginTop: 12 }}>
-            <label>
-              <input
-                type="checkbox"
-                checked={showAvailableOnly}
-                onChange={(e) => setShowAvailableOnly(e.target.checked)}
-              />{" "}
-              Show available only
-            </label>
+            >
+              {[1,2,3,4,5,6,7,8].map(n => (
+                <option key={n} value={n}>
+                  {n}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
 
