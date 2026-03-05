@@ -19,7 +19,7 @@ const [suggestedTableId, setSuggestedTableId] = useState(null);
 
 //run once, fetch my tables
 useEffect(() => {
-  fetch("http://localhost:8080/api/tables")
+  fetch("http://backend:8080/api/tables")
     .then((res) => res.json())
     .then((data) => setTables(data))
     .catch((err) => console.error(err));
@@ -28,7 +28,7 @@ useEffect(() => {
 //fetch bookings on date change
 useEffect(() => {
   //compose url
-  const url = `http://localhost:8080/api/bookings?date=${encodeURIComponent(selectedDate)}`;
+  const url = `http://backend:8080/api/bookings?date=${encodeURIComponent(selectedDate)}`;
 //fetch it now
 fetch(url)
   .then((res) => res.json())
