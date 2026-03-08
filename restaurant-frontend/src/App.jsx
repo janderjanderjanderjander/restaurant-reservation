@@ -27,6 +27,7 @@ useEffect(() => {
     .catch((err) => console.error(err));
 }, []);
 
+
 //fetch bookings on date change
 useEffect(() => {
   const url = `${API}/api/bookings?date=${encodeURIComponent(selectedDate)}`;

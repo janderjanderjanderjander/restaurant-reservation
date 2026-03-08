@@ -6,7 +6,7 @@ command -v node >/dev/null 2>&1 || { echo "Node.js is required"; exit 1; }
 command -v npm >/dev/null 2>&1 || { echo "npm is required"; exit 1; }
 
 cd restaurant-backend
-./mvnw spring-boot:run &
+mvn spring-boot:run &
 echo $! > ../backend.pid
 
 cd ../restaurant-frontend
@@ -24,4 +24,4 @@ elif command -v open >/dev/null 2>&1; then
   open "$URL"
 fi
 
-wait
+sleep 5
