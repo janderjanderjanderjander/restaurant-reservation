@@ -2,6 +2,8 @@ import { useState, useEffect, useMemo } from "react";
 
 export default function App() {
 
+const API = import.meta.env.VITE_API_URL;
+
 //Time now in utc
 const now = new Date();
 now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
@@ -19,7 +21,7 @@ const [suggestedTableId, setSuggestedTableId] = useState(null);
 
 //run once, fetch my tables
 useEffect(() => {
-  fetch("http://localhost:8082/api/tables")
+  fetch(`${API}/api/tables`)
     .then((res) => res.json())
     .then((data) => setTables(data))
     .catch((err) => console.error(err));
@@ -27,8 +29,7 @@ useEffect(() => {
 
 //fetch bookings on date change
 useEffect(() => {
-  //compose url
-  const url = `http://localhost:8082/api/bookings?date=${encodeURIComponent(selectedDate)}`;
+  const url = `${API}/api/bookings?date=${encodeURIComponent(selectedDate)}`;
 //fetch it now
 fetch(url)
   .then((res) => res.json())
