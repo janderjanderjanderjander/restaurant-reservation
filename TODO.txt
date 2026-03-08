@@ -1,2 +1,0 @@
-Add docker
-Figure out a way to run it cleanly, test on other ubuntu device.
