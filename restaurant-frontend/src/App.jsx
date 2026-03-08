@@ -21,7 +21,7 @@ const [suggestedTableId, setSuggestedTableId] = useState(null);
 
 //run once, fetch my tables
 useEffect(() => {
-  fetch(`${API}/api/tables`)
+  fetch(`/api/tables`)
     .then((res) => res.json())
     .then((data) => setTables(data))
     .catch((err) => console.error(err));
@@ -30,7 +30,7 @@ useEffect(() => {
 
 //fetch bookings on date change
 useEffect(() => {
-  const url = `${API}/api/bookings?date=${encodeURIComponent(selectedDate)}`;
+  const url = `/api/bookings?date=${encodeURIComponent(selectedDate)}`;
 //fetch it now
 fetch(url)
   .then((res) => res.json())
